@@ -3,11 +3,13 @@
 
   interface Props {
     states: (ChannelState | null)[];
+    /** 0..1 activity per channel key, drawn behind the instrument name. */
+    levels: number[];
     /** When >1 we prefix the channel column with "P<n>-" to disambiguate. */
     portCount: number;
   }
 
-  let { states, portCount }: Props = $props();
+  let { states, levels, portCount }: Props = $props();
 
   // Skip null slots so only channels that have actually emitted an event
   // appear. `states` is already in port*16+ch order, so the filtered
@@ -33,7 +35,12 @@
           <td class="col-ch">
             {#if portCount > 1}<span class="port-tag">P{state.port + 1}</span>{/if}{state.channel + 1}
           </td>
-          <td class="col-inst">{gmName(state.program)}</td>
+          <td
+            class="col-inst"
+            style:--level={levels[state.port * CHANNELS_PER_PORT + state.channel] ?? 0}
+          >
+            {gmName(state.program)}
+          </td>
           <td class="col-num">{state.program}</td>
           <td class="col-num">{state.volume}</td>
           <td class="col-num">{state.pan}</td>
@@ -80,6 +87,12 @@
   }
   .col-inst {
     text-align: left;
+    /* Hard stop at the level position so the bar has a crisp edge. */
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--accent) 22%, transparent) calc(var(--level, 0) * 100%),
+      transparent calc(var(--level, 0) * 100%)
+    );
   }
   .col-num {
     text-align: right;

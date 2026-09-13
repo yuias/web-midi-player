@@ -28,6 +28,7 @@
     MAX_CHANNELS,
     type ChannelState,
   } from './lib/channelState';
+  import { LevelMeter } from './lib/levelMeter.svelte';
   import FileLoader from './components/FileLoader.svelte';
   import Controls from './components/Controls.svelte';
   import LogView from './components/LogView.svelte';
@@ -102,6 +103,7 @@
   let channelStates = $state<(ChannelState | null)[]>(
     new Array(MAX_CHANNELS).fill(null),
   );
+  const levelMeter = new LevelMeter();
 
   // Filtered view fed to LogView. Recomputes only when logLines or filters
   // change — cheap enough for 10k-row logs.
@@ -173,7 +175,9 @@
         // a CC value we discard from the log would otherwise vanish from
         // the channel table next reset cycle. This runs even when the Log
         // view is hidden so ChannelTable stays accurate.
-        applyLogLines(channelStates, lines);
+        applyLogLines(channelStates, lines, (state, velocity) =>
+          levelMeter.hit(state, velocity),
+        );
         if (!debugEnabled) return;
         const combined = logLines.length + lines.length;
         if (combined > MAX_LOG_LINES) {
@@ -268,6 +272,7 @@
     position = { tick: 0, secs: 0, bpm: 120, isPlaying: false };
     logLines = [];
     channelStates = new Array(MAX_CHANNELS).fill(null);
+    levelMeter.reset();
     changeModeOverride('auto');
     client?.loadMidi(bytes);
   }
@@ -422,6 +427,7 @@
       <h2>Channels</h2>
       <ChannelTable
         states={channelStates}
+        levels={levelMeter.levels}
         portCount={midiInfo.port_count}
       />
     </section>
@@ -694,7 +700,7 @@
     padding-top: 1rem;
     border-top: 1px solid var(--border);
     text-align: right;
-    font-size: 0.8rem;
+    font-size: 0.875rem;
     color: var(--fg-muted);
   }
   footer a {

@@ -50,7 +50,7 @@ export function makeDefaultState(port: number, channel: number): ChannelState {
 //   "  P{port} Ch{ch:>2}  NoteOn      key={key:<3} vel={vel}"
 const RE_PRG = /\bP(\d+) Ch\s*(\d+)\s+PrgChange\s+prog=(\d+)/;
 const RE_CC = /\bP(\d+) Ch\s*(\d+)\s+CC\s+ctl=\s*(\d+)\s+val=(\d+)/;
-const RE_NOTE_ON = /\bP(\d+) Ch\s*(\d+)\s+NoteOn/;
+const RE_NOTE_ON = /\bP(\d+) Ch\s*(\d+)\s+NoteOn\s+key=\s*\d+\s+vel=(\d+)/;
 
 const CC_VOLUME = 7;
 const CC_PAN = 10;
@@ -67,10 +67,14 @@ export function gmName(program: number): string {
  * (NoteOn, CC for one of the tracked controllers, or ProgramChange),
  * at which point it is materialised with GM defaults and the event's
  * value is folded in. This keeps the table to "channels actually used".
+ *
+ * `onNoteOn` fires for every sounding NoteOn (velocity > 0) after the
+ * channel state is up to date, so callers can read Vol/Exp from `state`.
  */
 export function applyLogLines(
   states: (ChannelState | null)[],
   lines: string[],
+  onNoteOn?: (state: ChannelState, velocity: number) => void,
 ): void {
   for (const line of lines) {
     let m = line.match(RE_PRG);
@@ -91,7 +95,10 @@ export function applyLogLines(
     }
     m = line.match(RE_NOTE_ON);
     if (m) {
-      ensure(states, +m[1], +m[2]);
+      const state = ensure(states, +m[1], +m[2]);
+      const velocity = +m[3];
+      // NoteOn with velocity 0 is a NoteOff by MIDI convention.
+      if (velocity > 0) onNoteOn?.(state, velocity);
     }
   }
 }
