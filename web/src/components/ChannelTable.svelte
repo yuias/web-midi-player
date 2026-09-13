@@ -49,8 +49,8 @@
     width: 100%;
     border-collapse: collapse;
     font-family: ui-monospace, Consolas, monospace;
-    font-size: 0.8rem;
-    line-height: 1.35;
+    font-size: 0.875rem;
+    line-height: 1.4;
     margin: 0 0 0.5rem;
     background: var(--code-bg);
     border: 1px solid var(--border);
@@ -67,7 +67,7 @@
   }
   .ch-table th {
     font-weight: 500;
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     color: var(--fg-muted);
     text-transform: uppercase;
     letter-spacing: 0.02em;
@@ -89,7 +89,7 @@
   .port-tag {
     color: var(--fg-dim);
     margin-right: 0.25rem;
-    font-size: 0.7rem;
+    font-size: 0.78rem;
   }
   .ch-table tbody tr:hover {
     background: color-mix(in srgb, var(--accent) 8%, transparent);

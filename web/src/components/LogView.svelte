@@ -10,7 +10,7 @@
     /** Approximate row height in px; the virtualizer remeasures actual rows. */
     rowHeight?: number;
   }
-  let { lines, autoFollow = $bindable(true), rowHeight = 18 }: Props = $props();
+  let { lines, autoFollow = $bindable(true), rowHeight = 19 }: Props = $props();
 
   let parentRef: HTMLDivElement | undefined = $state();
 
@@ -92,7 +92,7 @@
     border: 1px solid var(--border);
     border-radius: 4px;
     font-family: ui-monospace, Consolas, monospace;
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.4;
     color: var(--fg);
   }

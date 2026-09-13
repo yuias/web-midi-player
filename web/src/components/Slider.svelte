@@ -89,6 +89,6 @@
     text-align: right;
     font-variant-numeric: tabular-nums;
     color: var(--fg-muted);
-    font-size: 0.82rem;
+    font-size: 0.875rem;
   }
 </style>

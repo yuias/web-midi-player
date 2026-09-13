@@ -507,7 +507,7 @@
 
 <style>
   main {
-    max-width: 720px;
+    max-width: 760px;
     margin: 0 auto;
     padding: 1.5rem 1rem 3rem;
     color: var(--fg);
@@ -518,17 +518,17 @@
     padding-bottom: 0.75rem;
     margin-bottom: 1.5rem;
   }
-  h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  h1 { margin: 0; font-size: 1.75rem; font-weight: 600; }
   h2 {
     margin: 0 0 0.5rem;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: var(--fg-secondary);
   }
 
   .status-line {
     margin-top: 0.25rem;
-    font-size: 0.8rem;
+    font-size: 0.875rem;
     color: var(--fg-muted);
     display: flex;
     gap: 0.4rem;
@@ -543,7 +543,7 @@
     align-items: center;
     gap: 0.6rem;
     margin: 0.25rem 0 0.5rem 4rem;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
 
   .boot-overlay {
@@ -578,7 +578,7 @@
   }
   .boot-card h2 { margin: 0 0 0.6rem; }
   .boot-card p { margin: 0.4rem 0 0; font-size: 0.9rem; }
-  .boot-card .hint { margin-top: 0.6rem; font-size: 0.78rem; }
+  .boot-card .hint { margin-top: 0.6rem; font-size: 0.85rem; }
   .boot-card progress {
     display: block;
     width: 100%;
@@ -592,14 +592,14 @@
     padding: 0.05rem 0.3rem;
     border-radius: 3px;
     font-family: ui-monospace, Consolas, monospace;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--fg);
   }
 
   .err {
     color: var(--danger);
     margin: 0.5rem 0 0;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
 
   dl {
@@ -652,7 +652,7 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
 
   .filter-chips {
@@ -663,7 +663,7 @@
   }
   .chip {
     padding: 0.2rem 0.7rem;
-    font-size: 0.78rem;
+    font-size: 0.85rem;
     font-weight: 500;
     border-radius: 999px;
     background: transparent;
@@ -685,7 +685,7 @@
 
   .btn-ghost {
     padding: 0.25rem 0.85rem;
-    font-size: 0.82rem;
+    font-size: 0.875rem;
     border-radius: 8px;
   }
 

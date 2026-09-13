@@ -40,7 +40,7 @@
     background: transparent;
     color: var(--fg-secondary);
     padding: 0.35rem 0.9rem;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 500;
     border-radius: 8px;
     cursor: pointer;

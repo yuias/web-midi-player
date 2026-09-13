@@ -112,7 +112,7 @@
   }
   .picker {
     padding: 0.3rem 0.9rem;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
   .meta {
     font-size: 0.9rem;
