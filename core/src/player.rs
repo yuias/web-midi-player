@@ -3,11 +3,11 @@
 
 use wasm_bindgen::prelude::*;
 
-use crate::midi::event::{MidiEvent, TimedMidiEvent};
-use crate::midi::mode_detect::{detect_mode, MidiMode};
-use crate::midi::parser::parse_midi;
-use crate::sequencer::Sequencer;
-use crate::synth::engine::SynthPool;
+use ump_playback::midi::event::{MidiEvent, TimedMidiEvent};
+use ump_playback::midi::mode_detect::{detect_mode, MidiMode};
+use ump_playback::midi::parser::parse_midi;
+use ump_playback::sequencer::Sequencer;
+use ump_playback::synth::engine::SynthPool;
 
 /// Format a single MIDI event as one line for the UI log window.
 /// Padded so columns line up in a monospace view.
@@ -111,6 +111,12 @@ pub struct Player {
     override_mode: Option<u8>,
     /// When true the sequencer rewinds to tick 0 after finishing.
     loop_enabled: bool,
+
+    /// Transport state. The AudioWorklet owns the player outright, so plain
+    /// bools suffice.
+    playing: bool,
+    stopped: bool,
+    finished: bool,
 }
 
 /// Canonical reset SysEx (sans F0/F7 framing) for each mode.
@@ -132,6 +138,7 @@ fn mode_sysex_bytes(mode: u8) -> &'static [u8] {
 impl Player {
     #[wasm_bindgen(constructor)]
     pub fn new(sample_rate: u32) -> Player {
+        crate::debug::init();
         Player {
             sample_rate,
             synth: None,
@@ -140,6 +147,9 @@ impl Player {
             detected_mode: 0,
             override_mode: None,
             loop_enabled: false,
+            playing: false,
+            stopped: true,
+            finished: false,
         }
     }
 
@@ -178,6 +188,9 @@ impl Player {
 
         let seq = Sequencer::new(&midi_data, tempo_map);
         self.sequencer = Some(seq);
+        self.playing = false;
+        self.stopped = true;
+        self.finished = false;
         self.detected_mode = detected_u8;
         // Preserve the user's override across loads — they likely want the
         // forced mode to keep applying to the next file too.
@@ -199,26 +212,30 @@ impl Player {
     }
 
     pub fn play(&mut self) {
-        if let Some(seq) = self.sequencer.as_mut() {
-            seq.play();
+        if self.sequencer.is_some() {
+            self.playing = true;
+            self.stopped = false;
+            self.finished = false;
         }
     }
 
     pub fn pause(&mut self) {
-        if let Some(seq) = self.sequencer.as_mut() {
-            seq.pause();
-        }
+        self.playing = false;
     }
 
     pub fn stop(&mut self) {
         if let (Some(seq), Some(synth)) = (self.sequencer.as_mut(), self.synth.as_mut()) {
-            seq.stop(synth);
+            self.playing = false;
+            self.stopped = true;
+            // Seek replay is not logged; the log shows only audible playback.
+            seq.seek_to_tick(0, synth, &mut ());
+            self.finished = false;
         }
     }
 
     #[wasm_bindgen(getter)]
     pub fn is_playing(&self) -> bool {
-        self.sequencer.as_ref().is_some_and(|s| s.is_playing())
+        self.playing
     }
 
     #[wasm_bindgen(getter)]
@@ -295,18 +312,24 @@ impl Player {
         let before = self.event_log.len();
         let effective = self.override_mode.unwrap_or(self.detected_mode);
         match (self.sequencer.as_mut(), self.synth.as_mut()) {
-            (Some(seq), Some(synth)) => {
+            (Some(seq), Some(synth)) if self.playing && !self.stopped && !self.finished => {
                 seq.fill_buffer(synth, left, right, &mut self.event_log);
-                if self.loop_enabled && seq.is_finished() {
+                if seq.is_finished() {
+                    self.finished = true;
+                    self.playing = false;
+                }
+                if self.loop_enabled && self.finished {
                     // Rewind, reset the synth, and re-stamp the effective
                     // mode so the next loop iteration starts clean.
-                    seq.seek_to_tick(0, synth);
+                    seq.seek_to_tick(0, synth, &mut ());
                     let bytes = mode_sysex_bytes(effective);
                     if !bytes.is_empty() {
                         synth.process_sysex(bytes);
                         synth.system_reset();
                     }
-                    seq.play();
+                    self.playing = true;
+                    self.stopped = false;
+                    self.finished = false;
                 }
             }
             _ => {

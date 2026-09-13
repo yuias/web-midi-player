@@ -88,6 +88,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "log"
+version = "0.4.34"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6"
+
+[[package]]
 name = "midly"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -175,6 +181,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "ump-playback"
+version = "0.1.0"
+source = "git+https://github.com/yuiAs/ump?rev=0e4ddce51ee3bf2d03ad076c531ae0d7a22cb6ee#0e4ddce51ee3bf2d03ad076c531ae0d7a22cb6ee"
+dependencies = [
+ "anyhow",
+ "log",
+ "midly",
+ "rustysynth",
+]
+
+[[package]]
 name = "unicode-ident"
 version = "1.0.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -229,9 +246,8 @@ dependencies = [
 name = "web-midi-player-core"
 version = "0.2.0"
 dependencies = [
- "anyhow",
- "midly",
- "rustysynth",
+ "log",
+ "ump-playback",
  "wasm-bindgen",
  "web-sys",
 ]

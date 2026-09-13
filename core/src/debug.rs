@@ -1,40 +1,26 @@
-//! Logging primitives for the wasm core.
-//!
-//! Mirrors the macro surface (`log_error!`, `log_warn!`, `log_info!`) of the
-//! ump native crate, but writes through `console.log` instead of a file so
-//! the same `crate::midi::*` sources port without modification.
+//! Console logger for the `log` facade used by ump-playback.
 
 use wasm_bindgen::JsValue;
 
-#[doc(hidden)]
-pub fn write_log(level: &str, msg: &str) {
-    web_sys::console::log_1(&JsValue::from_str(&format!("[{level}] {msg}")));
+struct ConsoleLogger;
+
+impl log::Log for ConsoleLogger {
+    fn enabled(&self, _metadata: &log::Metadata) -> bool {
+        true
+    }
+
+    fn log(&self, record: &log::Record) {
+        let line = format!("[{}] {}", record.level(), record.args());
+        web_sys::console::log_1(&JsValue::from_str(&line));
+    }
+
+    fn flush(&self) {}
 }
 
-/// Verbose flag toggle. Currently always-on; reserved for later UI control.
-pub fn is_verbose() -> bool {
-    true
-}
-
-#[macro_export]
-macro_rules! log_error {
-    ($($arg:tt)*) => {
-        $crate::debug::write_log("ERROR", &format!($($arg)*))
-    };
-}
-
-#[macro_export]
-macro_rules! log_warn {
-    ($($arg:tt)*) => {
-        $crate::debug::write_log("WARN", &format!($($arg)*))
-    };
-}
-
-#[macro_export]
-macro_rules! log_info {
-    ($($arg:tt)*) => {
-        if $crate::debug::is_verbose() {
-            $crate::debug::write_log("INFO", &format!($($arg)*))
-        }
-    };
+/// Install the console logger. Later calls are no-ops, so every `Player`
+/// constructor can call it.
+pub fn init() {
+    if log::set_logger(&ConsoleLogger).is_ok() {
+        log::set_max_level(log::LevelFilter::Info);
+    }
 }

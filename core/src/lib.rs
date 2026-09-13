@@ -1,16 +1,10 @@
 //! web-midi-player core (Wasm).
 //!
-//! Phase 2 layer-in: MIDI parsing modules ported from the ump native crate.
-//! Synthesis + sequencer wiring lands in subsequent steps.
+//! Thin wasm-bindgen layer over `ump-playback`, which provides MIDI parsing,
+//! sequencing, and SF2 synthesis.
 
-// `#[macro_use]` mirrors ump's main.rs so log_info!/log_warn!/log_error!
-// are reachable from sibling modules without explicit imports.
-#[macro_use]
 pub mod debug;
-pub mod midi;
 pub mod player;
-pub mod sequencer;
-pub mod synth;
 
 pub use player::Player;
 

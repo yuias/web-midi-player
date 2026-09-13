@@ -11,9 +11,8 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 wasm-bindgen = "0.2"
-anyhow = "1"
-midly = "0.5"
-rustysynth = { git = "https://github.com/yuiAs/rustysynth", branch = "develop" }
+log = "0.4"
+ump-playback = { git = "https://github.com/yuiAs/ump", rev = "0e4ddce51ee3bf2d03ad076c531ae0d7a22cb6ee" }
 web-sys = { version = "0.3", features = ["console"] }
 
 [profile.release]
