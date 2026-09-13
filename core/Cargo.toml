@@ -1,6 +1,6 @@
 [package]
 name = "web-midi-player-core"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 license = "MIT"
 description = "Core MIDI parsing + SF2 synthesis (Wasm) for web-midi-player"
