@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "web-midi-player",
+  // Must not exceed the workerd version bundled with the installed wrangler.
+  "compatibility_date": "2026-09-01",
+  "observability": {
+    "enabled": true
+  },
+  "workers_dev": true,
+  "routes": [{ "pattern": "midi.rly3h.app", "custom_domain": true }],
+  // Static assets only, no Worker script. COOP/COEP come from
+  // public/_headers, which the asset server applies as-is.
+  "assets": {
+    "directory": "./dist"
+  }
+}

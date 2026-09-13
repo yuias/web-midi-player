@@ -48,6 +48,21 @@ is true; without it the AudioWorklet + wasm path will not work in some
 browsers. If you serve the build with your own server, keep those two
 headers.
 
+## Deploy
+
+Served from the `web-midi-player` Cloudflare Worker as static assets only
+(`web/wrangler.jsonc`), on `midi.rly3h.app`. `web/public/_headers` carries
+the COOP/COEP headers to production.
+
+```sh
+cd web
+npx wrangler login   # once
+npm run deploy       # wasm + Vite build, then wrangler deploy
+```
+
+For Git-triggered deploys, connect the repository in Workers Builds with the
+settings noted at the top of `cloudflare-build.sh`.
+
 ## Quick check
 
 ```sh

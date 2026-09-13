@@ -1,20 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Cloudflare Pages build entrypoint.
+# Cloudflare Workers Builds entrypoint.
 #
-# The Pages build image (v3, currently Node 22.x) ships Node + npm but no Rust
-# toolchain, so we install rustup + wasm-pack on the fly, then run the same
-# wasm + Vite pipeline used locally. `~/.cargo` is not in the Pages build
-# cache, so this install runs on every build (~30-60s).
+# The build image ships Node + npm but no Rust toolchain, so we install
+# rustup + wasm-pack on the fly, then run the same wasm + Vite pipeline used
+# locally. `~/.cargo` is not cached between builds, so this install runs on
+# every build (~30-60s).
 #
-# Suggested Pages settings — option A (root = repo root):
-#   Build command:    bash cloudflare-build.sh
-#   Build output dir: web/dist
-#
-# Option B (root = web/, invoked via npm script):
-#   Build command:    npm run cloudflare:build
-#   Build output dir: dist
+# Workers Builds settings:
+#   Root directory:  web
+#   Build command:   npm run cloudflare:build
+#   Deploy command:  npx wrangler deploy   (reads web/wrangler.jsonc)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -30,13 +27,13 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
 #    (see https://blog.rust-lang.org/inside-rust/2025/07/21/sunsetting-the-rustwasm-github-org/);
 #    the old rustwasm.github.io URL still resolves but is pinned to v0.13.1.
 rustup target add wasm32-unknown-unknown
-# `init.sh` contains bash-isms; piping to `sh` (= dash on the CF Pages image)
+# `init.sh` contains bash-isms; piping to `sh` (= dash on the CF build image)
 # trips a syntax error at the first function definition. Pipe to bash.
 curl --proto '=https' --tlsv1.2 -sSf \
   https://wasm-bindgen.github.io/wasm-pack/installer/init.sh | bash
 
 # 3. Build the wasm core, then the Svelte app. `npm ci` is idempotent even if
-#    CF Pages already ran an install step for us.
+#    the build image already ran an install step for us.
 cd "$SCRIPT_DIR/web"
 npm ci
 npm run wasm
